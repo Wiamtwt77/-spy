@@ -3,29 +3,22 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  // استخدام متغير البيئة الخاص بك OPENROUTER_GAME
   const apiKey = process.env.OPENROUTER_GAME;
   if (!apiKey) {
     return res.status(500).json({ error: "Configuration Error: OPENROUTER_GAME missing" });
   }
 
-  const { categories = [], usedTopics = [] } = req.body || {};
-  const categoriesStr = categories.length > 0 ? categories.join('، ') : 'عام، أسطوري، يوميات، وظائف';
-  const usedStr = usedTopics.length > 0 ? usedTopics.join('، ') : 'لا يوجد';
+  const prompt = `أنت مبتكر ألعاب ذكي. أنشئ ثنائية مواضيع للعبة 'جاسوس وكاشف' تعتمد على 'نظام السياق والموقف المشترك'.
 
-  const prompt = `أنت المبتكر للعبة 'جاسوس وكاشف'.
-مهمتك: توليد زوج من المواضيع المتقاربة جداً وذكية باللغة العربية.
+القواعد:
+1. "context": سياق أو بيئة موحدة تجمع الطرفين (مثال: "في صالة الأفراح"، "في غرفة العمليات"، "في المطار").
+2. "realTopic": موضوع دقيق وواضح داخل هذا السياق (مثال: "أم العروس").
+3. "fakeTopic": موضوع يتشارك نفس البيئة والموقف ولكن بزاوية مختلفة (مثال: "منظمة الحفل").
+4. الهدف: أن يكتب الجاسوس تلميحات تناسب البيئة العامة ويتوهم أنه داخل الموضوع، ولكن الكاشف يلمح الزاوية المختلفة بسهولة.
 
-التصنيفات المتاحة: [${categoriesStr}]
-مواضيع سابقة (ممنوع التكرار): [${usedStr}]
-
-قواعد توليد الفكرة:
-1. "realTopic": موضوع محدد جداً وواضح (مثال: "طباخ في مطعم فاخر").
-2. "fakeTopic": موضوع من نفس البيئة أو المجال وبينهما تشابه كبير جداً في التلميحات السطحية (مثال: "ناقد طعام في برنامج تلفزيوني").
-3. الفارق الضمني يجب أن يكون دقيقاً بحيث يتبين فقط عند كتابة التلميحات التفصيلية.
-
-المطلوب: رد بصيغة JSON فقط (Valid JSON Object) بدون أي علامات Markdown:
+المطلوب: رد بصيغة JSON فقط (Valid JSON Object) بدون Markdown:
 {
+  "context": "السياق المشترك",
   "realTopic": "الموضوع الحقيقي",
   "fakeTopic": "الموضوع الخاطئ للجاسوس"
 }`;
@@ -45,7 +38,7 @@ export default async function handler(req, res) {
           { role: "system", content: "You are a JSON-only API for an Arabic party game. Always return valid raw JSON." },
           { role: "user", content: prompt }
         ],
-        temperature: 0.9
+        temperature: 0.95
       })
     });
 
@@ -64,10 +57,10 @@ export default async function handler(req, res) {
     console.error("Error context fallback:", error);
 
     const fallbacks = [
-      { realTopic: "طيار مدني في شركة طيران", fakeTopic: "مراقب برج المراقبة الجوية" },
-      { realTopic: "جراح في غرفة العمليات", fakeTopic: "طبيب إسعاف في الميدان" },
-      { realTopic: "مدرب فريق كرة قدم", fakeTopic: "حكم مباراة نهائية" },
-      { realTopic: "مصور صحفي في منطقة حرب", fakeTopic: "صحفي تحقيقات استقصائية" }
+      { context: "في صالة الأفراح 💒", realTopic: "أم العروس", fakeTopic: "منظمة الحفل (Event Planner)" },
+      { context: "في غرفة العمليات 🏥", realTopic: "طبيب جراحة القلب", fakeTopic: "مخدر العمليات (Anesthesiologist)" },
+      { context: "في المطار ✈️", realTopic: "طيار مدني", fakeTopic: "مراقب برج المراقبة" },
+      { context: "في المحكمة ⚖️", realTopic: "القاضي", fakeTopic: "محامي الدفاع" }
     ];
 
     const randomFallback = fallbacks[Math.floor(Math.random() * fallbacks.length)];
