@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة جاسوس وكاشف 🕵️‍♂️🔍</title>
+    <title>جاسوس وكاشف 🕵️‍♂️🔍</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #07070e;
-            --card-bg: rgba(18, 18, 32, 0.8);
+            --card-bg: rgba(18, 18, 32, 0.85);
             --neon-cyan: #00f3ff;
             --neon-pink: #ff007f;
             --neon-green: #39ff14;
@@ -142,12 +142,22 @@
         }
 
         .hint-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             border-right: 4px solid var(--neon-cyan);
             padding: 12px;
             border-radius: 10px;
             text-align: right;
             font-size: 0.95rem;
+        }
+
+        .color-legend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.9rem;
         }
 
         .spinner {
@@ -198,7 +208,7 @@
         <!-- 1. الشاشة الرئيسية والتجهيز -->
         <div id="screen-setup" class="screen active">
             <h1 class="title">جاسوس وكاشف 🕵️‍♂️🔍</h1>
-            <p class="subtitle">نمط التلميحات الفردية وكشف الأدوار</p>
+            <p class="subtitle">شفرة الألوان والإيهام بالسياق المشترك</p>
             
             <div style="display: flex; gap: 8px; justify-content: center;" id="playerCountBtns">
                 <button class="btn-neon" style="width: auto; padding: 8px 15px;" onclick="setPlayerCount(3)">3</button>
@@ -216,7 +226,7 @@
         <div id="screen-loading" class="screen">
             <h1 class="title">جاري التوليد...</h1>
             <div class="spinner"></div>
-            <p class="subtitle">توليد مواضيع ذكية للذكاء الاصطناعي 🤖</p>
+            <p class="subtitle">الذكاء الاصطناعي يبتكر مواضيع متقاطعة بذكاء 🤖</p>
         </div>
 
         <!-- 3. تمرير الهاتف لإظهار الدور -->
@@ -224,26 +234,37 @@
             <h1 class="title">مرر الهاتف 📱</h1>
             <p class="subtitle">اعطِ الهاتف إلى:</p>
             <h2 id="passRolePlayerName" style="color: var(--neon-cyan); font-size: 1.8rem;"></h2>
-            <button class="btn-neon btn-green" onclick="showPlayerRole()">عرض دوري وموضوعي 🔒</button>
+            <button class="btn-neon btn-green" onclick="showPlayerRole()">عرض دوري ولوني السري 🔒</button>
         </div>
 
-        <!-- 4. عرض الدور والموضوع -->
+        <!-- 4. عرض الدور واللون والموضوع -->
         <div id="screen-view-role" class="screen">
             <h2 id="rolePlayerNameDisplay" style="color: var(--neon-pink);"></h2>
             <div class="card-box">
                 <div id="roleBadge" style="font-weight: 800; font-size: 1.2rem;"></div>
-                <hr style="border: 0.5px solid rgba(255,255,255,0.1);">
-                <div style="color: var(--text-muted); font-size: 0.9rem;">الموضوع المخصص لك:</div>
+                
+                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">لونك السري في الجولة:</span><br>
+                    <b id="playerColorDisplay" style="font-size: 1.3rem;"></b>
+                </div>
+
+                <div style="color: var(--text-muted); font-size: 0.85rem;">السياق العام: <b id="contextDisplay" style="color:#fff;"></b></div>
                 <div id="roleTopicDisplay" style="font-size: 1.4rem; font-weight: 900; color: var(--neon-yellow);"></div>
                 <div id="roleDescDisplay" style="font-size: 0.85rem; color: var(--text-muted);"></div>
+
+                <!-- خريطة الكاشف السرية -->
+                <div id="detectorLegendBox" style="display: none; border-top: 1px dashed var(--neon-cyan); padding-top: 10px; text-align: right;">
+                    <p style="font-size: 0.8rem; color: var(--neon-cyan); font-weight: 800; margin-bottom: 6px;">🗺️ خريطة الألوان الخاصة بالكاشف فقط (احفظها سرّاً):</p>
+                    <div id="legendList" style="display: flex; flex-direction: column; gap: 4px;"></div>
+                </div>
             </div>
-            <button class="btn-neon btn-pink" onclick="finishRoleView()">فهمت (إخفاء) 🙈</button>
+            <button class="btn-neon btn-pink" onclick="finishRoleView()">فهمت (إخفاء الشاشة) 🙈</button>
         </div>
 
         <!-- 5. مركز الجولة (طلب لمح) -->
         <div id="screen-round-hub" class="screen">
             <h1 class="title" id="roundTitle">الجولة 1</h1>
-            <p class="subtitle">اضغط على الزر للبدء بتوزيع دور التلميحات على الجميع</p>
+            <p class="subtitle">اضغط على الزر لبدء توزيع أدوار التلميحات</p>
             <button class="btn-neon btn-yellow" style="font-size: 1.5rem; padding: 25px;" onclick="startHintCollection()">🎯 اطلب لمح</button>
         </div>
 
@@ -252,62 +273,61 @@
             <h1 class="title">دور التلميح ✍️</h1>
             <p class="subtitle">مرر الهاتف إلى:</p>
             <h2 id="hintPlayerName" style="color: var(--neon-cyan); font-size: 1.8rem;"></h2>
-            <button class="btn-neon btn-green" onclick="enterHintPhase()">أنا جاهز لكتابة التلميح 🔒</button>
+            <button class="btn-neon btn-green" onclick="enterHintPhase()">كتابة تلميحي 🔒</button>
         </div>
 
-        <!-- 7. كتابة التلميح (أو حظر) -->
+        <!-- 7. كتابة التلميح -->
         <div id="screen-input-hint" class="screen">
             <h2 id="activeHintWriter" style="color: var(--neon-pink);"></h2>
             <div id="hintInputBox" class="card-box">
-                <p style="font-size: 0.9rem; color: var(--text-muted);">اكتب تلميحاً قصيراً ومخادعاً عن موضوعك:</p>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">اكتب تلميحاً ذكياً عن موضوعك (سيُعرض بلونك السري فقط):</p>
                 <input type="text" id="hintTextInput" class="input-neon" placeholder="اكتب تلميحك هنا...">
                 <button class="btn-neon btn-green" onclick="submitHint()">إرسال التلميح 🚀</button>
             </div>
             <div id="hintBlockedBox" class="card-box" style="display: none;">
-                <h3 style="color: var(--neon-red);">🚫 أنت محظور هذه المرة!</h3>
-                <p style="font-size: 0.9rem;">لسوء الحظ لا يمكنك كتابة تلميح في هذه الجولة.</p>
+                <h3 style="color: var(--neon-red);">🚫 محظور هذه المرة!</h3>
+                <p style="font-size: 0.9rem;">تعذر إرسال تلميحك في هذه الجولة.</p>
                 <button class="btn-neon" onclick="submitHint(true)">متابعة ➔</button>
             </div>
         </div>
 
-        <!-- 8. مراجعة التلميحات -->
+        <!-- 8. مراجعة التلميحات بالرموز (توضع الطاولة في المنتصف) -->
         <div id="screen-review-hints" class="screen">
-            <h1 class="title">التلميحات المجمعة 📑</h1>
-            <p class="subtitle" id="reviewSubtitle"></p>
+            <h1 class="title">جدول التلميحات 📑</h1>
+            <p class="subtitle">ضعوا الهاتف في منتصف الطاولة ليقرأ الجميع التلميحات معاً!</p>
             
             <div class="card-box" id="hintsListContainer"></div>
 
-            <button class="btn-neon btn-green" onclick="goToDiscussion()">الانتقال لمرحلة الحوار 💬</button>
+            <button class="btn-neon btn-green" onclick="goToDiscussion()">الانتقال للحوار والتحليل 💬</button>
         </div>
 
         <!-- 9. الحوار والتصرف الجاسوسي -->
         <div id="screen-discussion" class="screen">
             <h1 class="title">وقت الحوار (2 دقيقة) 💬</h1>
-            <p class="subtitle">تناقشوا وحللوا التلميحات بحذر!</p>
+            <p class="subtitle">حللوا التلميحات واستدرجوا الشكوك!</p>
 
             <div style="font-size: 2.2rem; font-weight: 900; color: var(--neon-cyan);" id="discTimer">02:00</div>
 
-            <!-- زر خاص بالجاسوس بسرية -->
             <button class="btn-neon btn-pink" onclick="spyStrikeModal()">⚡ كشف الكاشف (خاص بالجاسوس)</button>
-            <button class="btn-neon" onclick="nextRoundOrFinal()">انتقال للجولة التالية / النهاية ➔</button>
+            <button class="btn-neon" onclick="nextRoundOrFinal()">الجولة التالية / الاتهام النهائي ➔</button>
         </div>
 
-        <!-- 10. محاولة الجاسوس السرية -->
+        <!-- 10. ضربة الجاسوس السرية -->
         <div id="screen-spy-strike" class="screen">
-            <h1 class="title" style="color: var(--neon-pink);">⚡ ضربة الجاسوس السرية</h1>
-            <p class="subtitle">اختر الشخص الذي تعتقد أنه الكاشف:</p>
+            <h1 class="title" style="color: var(--neon-pink);">⚡ محاولة الجاسوس السرية</h1>
+            <p class="subtitle">من تعتقد أنه الكاشف الذي يراقب ألوانكم؟</p>
             <div id="spyStrikeOptions" style="display: flex; flex-direction: column; gap: 10px;"></div>
             <button class="btn-neon" style="margin-top: 10px;" onclick="closeSpyStrike()">إلغاء والعودة</button>
         </div>
 
         <!-- 11. اتهام الكاشف النهائي -->
         <div id="screen-detector-accuse" class="screen">
-            <h1 class="title" style="color: var(--neon-yellow);">🔍 التهمة الأخيرة للكاشف</h1>
-            <p class="subtitle">يا كاشف، حدد من هو الجاسوس بدقة:</p>
+            <h1 class="title" style="color: var(--neon-yellow);">🔍 الاتهام النهائي للكاشف</h1>
+            <p class="subtitle">يا كاشف، بناءً على تحليل ألوان التلميحات: من هو الجاسوس؟</p>
             <div id="detectorAccuseOptions" style="display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
 
-        <!-- 12. نتيجة الجولة -->
+        <!-- 12. شاشة كشف الأقنعة والنتيجة -->
         <div id="screen-reveal" class="screen">
             <h1 class="title" id="revealTitle"></h1>
             <p class="subtitle" id="revealSub"></p>
@@ -315,8 +335,14 @@
             <div class="card-box">
                 <div>الكاشف: <b id="revealDetector" style="color: var(--neon-cyan);"></b></div>
                 <div>الجاسوس: <b id="revealSpy" style="color: var(--neon-pink);"></b></div>
+                <hr style="border:0.5px solid rgba(255,255,255,0.1);">
+                <div>السياق: <b id="revealContext" style="color: #fff;"></b></div>
                 <div>الموضوع الحقيقي: <b id="revealReal" style="color: var(--neon-green);"></b></div>
                 <div>موضوع الجاسوس: <b id="revealFake" style="color: var(--neon-yellow);"></b></div>
+                
+                <hr style="border:0.5px solid rgba(255,255,255,0.1);">
+                <p style="font-size:0.85rem; color:var(--text-muted);">كشف شفرة الألوان بالكامل:</p>
+                <div id="fullColorMapDisplay" style="font-size:0.85rem; display:flex; flex-direction:column; gap:4px;"></div>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
@@ -325,7 +351,6 @@
             </div>
         </div>
 
-        <!-- زر المطور -->
         <div class="developer-btn" onclick="showDevToast()">👨‍💻 المطور</div>
     </div>
 
