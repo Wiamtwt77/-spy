@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة جاسوس وكاشف 🕵️‍♂️🔍</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #07070e;
+            --card-bg: rgba(18, 18, 32, 0.8);
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff007f;
+            --neon-green: #39ff14;
+            --neon-purple: #9d00ff;
+            --neon-yellow: #ffe600;
+            --neon-red: #ff0055;
+            --text-main: #ffffff;
+            --text-muted: #a0a0c0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 243, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(157, 0, 255, 0.08) 0%, transparent 40%);
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.15);
+            border-radius: 24px;
+            padding: 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1.title {
+            font-size: 2.1rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+        }
+
+        p.subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .btn-neon {
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 14px 20px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            font-family: 'Cairo', sans-serif;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.2);
+            width: 100%;
+        }
+
+        .btn-neon:active, .btn-neon:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 25px var(--neon-cyan);
+        }
+
+        .btn-pink { border-color: var(--neon-pink); color: var(--neon-pink); box-shadow: 0 0 12px rgba(255, 0, 127, 0.2); }
+        .btn-pink:active, .btn-pink:hover { background: var(--neon-pink); color: #fff; box-shadow: 0 0 25px var(--neon-pink); }
+
+        .btn-green { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 12px rgba(57, 255, 20, 0.2); }
+        .btn-green:active, .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 25px var(--neon-green); }
+
+        .btn-yellow { border-color: var(--neon-yellow); color: var(--neon-yellow); box-shadow: 0 0 12px rgba(255, 230, 0, 0.2); }
+        .btn-yellow:active, .btn-yellow:hover { background: var(--neon-yellow); color: #000; box-shadow: 0 0 25px var(--neon-yellow); }
+
+        .input-neon {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1.5px solid rgba(0, 243, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            text-align: center;
+            outline: none;
+            width: 100%;
+        }
+
+        .card-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 20px;
+            padding: 20px 15px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .hint-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-right: 4px solid var(--neon-cyan);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: right;
+            font-size: 0.95rem;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid rgba(0, 243, 255, 0.2);
+            border-top-color: var(--neon-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .developer-btn {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(18, 18, 32, 0.95);
+            border: 1.5px solid var(--neon-cyan);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.4);
+            font-size: 0.95rem;
+            font-weight: 800;
+            z-index: 9999;
+            transition: all 0.4s ease;
+            opacity: 0;
+        }
+
+        .toast-notification.show { bottom: 25px; opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- 1. الشاشة الرئيسية والتجهيز -->
+        <div id="screen-setup" class="screen active">
+            <h1 class="title">جاسوس وكاشف 🕵️‍♂️🔍</h1>
+            <p class="subtitle">نمط التلميحات الفردية وكشف الأدوار</p>
+            
+            <div style="display: flex; gap: 8px; justify-content: center;" id="playerCountBtns">
+                <button class="btn-neon" style="width: auto; padding: 8px 15px;" onclick="setPlayerCount(3)">3</button>
+                <button class="btn-neon" style="width: auto; padding: 8px 15px;" onclick="setPlayerCount(4)">4</button>
+                <button class="btn-neon" style="width: auto; padding: 8px 15px;" onclick="setPlayerCount(5)">5</button>
+                <button class="btn-neon" style="width: auto; padding: 8px 15px;" onclick="setPlayerCount(6)">6</button>
+            </div>
+
+            <div id="playerInputs" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto;"></div>
+
+            <button class="btn-neon btn-green" onclick="startGame()">ابدأ الجولة 🚀</button>
+        </div>
+
+        <!-- 2. شاشة التحميل -->
+        <div id="screen-loading" class="screen">
+            <h1 class="title">جاري التوليد...</h1>
+            <div class="spinner"></div>
+            <p class="subtitle">توليد مواضيع ذكية للذكاء الاصطناعي 🤖</p>
+        </div>
+
+        <!-- 3. تمرير الهاتف لإظهار الدور -->
+        <div id="screen-pass-role" class="screen">
+            <h1 class="title">مرر الهاتف 📱</h1>
+            <p class="subtitle">اعطِ الهاتف إلى:</p>
+            <h2 id="passRolePlayerName" style="color: var(--neon-cyan); font-size: 1.8rem;"></h2>
+            <button class="btn-neon btn-green" onclick="showPlayerRole()">عرض دوري وموضوعي 🔒</button>
+        </div>
+
+        <!-- 4. عرض الدور والموضوع -->
+        <div id="screen-view-role" class="screen">
+            <h2 id="rolePlayerNameDisplay" style="color: var(--neon-pink);"></h2>
+            <div class="card-box">
+                <div id="roleBadge" style="font-weight: 800; font-size: 1.2rem;"></div>
+                <hr style="border: 0.5px solid rgba(255,255,255,0.1);">
+                <div style="color: var(--text-muted); font-size: 0.9rem;">الموضوع المخصص لك:</div>
+                <div id="roleTopicDisplay" style="font-size: 1.4rem; font-weight: 900; color: var(--neon-yellow);"></div>
+                <div id="roleDescDisplay" style="font-size: 0.85rem; color: var(--text-muted);"></div>
+            </div>
+            <button class="btn-neon btn-pink" onclick="finishRoleView()">فهمت (إخفاء) 🙈</button>
+        </div>
+
+        <!-- 5. مركز الجولة (طلب لمح) -->
+        <div id="screen-round-hub" class="screen">
+            <h1 class="title" id="roundTitle">الجولة 1</h1>
+            <p class="subtitle">اضغط على الزر للبدء بتوزيع دور التلميحات على الجميع</p>
+            <button class="btn-neon btn-yellow" style="font-size: 1.5rem; padding: 25px;" onclick="startHintCollection()">🎯 اطلب لمح</button>
+        </div>
+
+        <!-- 6. تمرير الهاتف لكتابة التلميح -->
+        <div id="screen-pass-hint" class="screen">
+            <h1 class="title">دور التلميح ✍️</h1>
+            <p class="subtitle">مرر الهاتف إلى:</p>
+            <h2 id="hintPlayerName" style="color: var(--neon-cyan); font-size: 1.8rem;"></h2>
+            <button class="btn-neon btn-green" onclick="enterHintPhase()">أنا جاهز لكتابة التلميح 🔒</button>
+        </div>
+
+        <!-- 7. كتابة التلميح (أو حظر) -->
+        <div id="screen-input-hint" class="screen">
+            <h2 id="activeHintWriter" style="color: var(--neon-pink);"></h2>
+            <div id="hintInputBox" class="card-box">
+                <p style="font-size: 0.9rem; color: var(--text-muted);">اكتب تلميحاً قصيراً ومخادعاً عن موضوعك:</p>
+                <input type="text" id="hintTextInput" class="input-neon" placeholder="اكتب تلميحك هنا...">
+                <button class="btn-neon btn-green" onclick="submitHint()">إرسال التلميح 🚀</button>
+            </div>
+            <div id="hintBlockedBox" class="card-box" style="display: none;">
+                <h3 style="color: var(--neon-red);">🚫 أنت محظور هذه المرة!</h3>
+                <p style="font-size: 0.9rem;">لسوء الحظ لا يمكنك كتابة تلميح في هذه الجولة.</p>
+                <button class="btn-neon" onclick="submitHint(true)">متابعة ➔</button>
+            </div>
+        </div>
+
+        <!-- 8. مراجعة التلميحات -->
+        <div id="screen-review-hints" class="screen">
+            <h1 class="title">التلميحات المجمعة 📑</h1>
+            <p class="subtitle" id="reviewSubtitle"></p>
+            
+            <div class="card-box" id="hintsListContainer"></div>
+
+            <button class="btn-neon btn-green" onclick="goToDiscussion()">الانتقال لمرحلة الحوار 💬</button>
+        </div>
+
+        <!-- 9. الحوار والتصرف الجاسوسي -->
+        <div id="screen-discussion" class="screen">
+            <h1 class="title">وقت الحوار (2 دقيقة) 💬</h1>
+            <p class="subtitle">تناقشوا وحللوا التلميحات بحذر!</p>
+
+            <div style="font-size: 2.2rem; font-weight: 900; color: var(--neon-cyan);" id="discTimer">02:00</div>
+
+            <!-- زر خاص بالجاسوس بسرية -->
+            <button class="btn-neon btn-pink" onclick="spyStrikeModal()">⚡ كشف الكاشف (خاص بالجاسوس)</button>
+            <button class="btn-neon" onclick="nextRoundOrFinal()">انتقال للجولة التالية / النهاية ➔</button>
+        </div>
+
+        <!-- 10. محاولة الجاسوس السرية -->
+        <div id="screen-spy-strike" class="screen">
+            <h1 class="title" style="color: var(--neon-pink);">⚡ ضربة الجاسوس السرية</h1>
+            <p class="subtitle">اختر الشخص الذي تعتقد أنه الكاشف:</p>
+            <div id="spyStrikeOptions" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            <button class="btn-neon" style="margin-top: 10px;" onclick="closeSpyStrike()">إلغاء والعودة</button>
+        </div>
+
+        <!-- 11. اتهام الكاشف النهائي -->
+        <div id="screen-detector-accuse" class="screen">
+            <h1 class="title" style="color: var(--neon-yellow);">🔍 التهمة الأخيرة للكاشف</h1>
+            <p class="subtitle">يا كاشف، حدد من هو الجاسوس بدقة:</p>
+            <div id="detectorAccuseOptions" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+
+        <!-- 12. نتيجة الجولة -->
+        <div id="screen-reveal" class="screen">
+            <h1 class="title" id="revealTitle"></h1>
+            <p class="subtitle" id="revealSub"></p>
+            
+            <div class="card-box">
+                <div>الكاشف: <b id="revealDetector" style="color: var(--neon-cyan);"></b></div>
+                <div>الجاسوس: <b id="revealSpy" style="color: var(--neon-pink);"></b></div>
+                <div>الموضوع الحقيقي: <b id="revealReal" style="color: var(--neon-green);"></b></div>
+                <div>موضوع الجاسوس: <b id="revealFake" style="color: var(--neon-yellow);"></b></div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                <button class="btn-neon btn-green" onclick="startGame()">🔄 العب مرة أخرى</button>
+                <button class="btn-neon" onclick="location.reload()">🏠 القائمة الرئيسية</button>
+            </div>
+        </div>
+
+        <!-- زر المطور -->
+        <div class="developer-btn" onclick="showDevToast()">👨‍💻 المطور</div>
+    </div>
+
+    <div id="devToast" class="toast-notification">
+        <span>💻 المطور:</span> <span style="color: var(--neon-cyan);">توات سليسو</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
